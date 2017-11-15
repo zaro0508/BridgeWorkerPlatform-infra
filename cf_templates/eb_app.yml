@@ -129,10 +129,6 @@ Parameters:
   Env:
     Type: String
     Default: param_place_holder
-  JdbcConnectionString:
-    Type: String
-    Default: param_place_holder
-    NoEcho: true
   SynapseApiKey:
     Type: String
     Default: param_place_holder
@@ -188,9 +184,6 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: ENV
           Value: !Ref Env
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: JDBC_CONNECTION_STRING
-          Value: !Ref JdbcConnectionString
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: bridge.env
           Value: !Ref BridgeEnv
