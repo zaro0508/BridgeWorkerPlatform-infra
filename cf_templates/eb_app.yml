@@ -1,0 +1,340 @@
+# This CF script is for creating an AWS elastic beanstalk application.
+#
+# Usage:
+#   1. Run the boostrap script to setup required resources for the app.
+#   2. Create the app with `aws cloudformation --create-stack` command
+#   3. Update the stack with `aws cloudformation --update-stack` command
+#
+# initial creation:
+#   aws --profile aws.admin.user --region us-east-1 cloudformation \
+#     create-stack --stack-name foo-develop --capabilities CAPABILITY_NAMED_IAM \
+#     --on-failure DELETE --template-body file://cf_templates/eb_app.yml \
+#     --parameters ParameterKey=EC2InstanceType,ParameterValue=t2.micro \
+#     ...[all params neeeded for app]
+#
+# updates:
+#   aws --profile aws.bootstrap.user --region us-east-1 cloudformation \
+#     update-stack --stack-name foo-develop --capabilities CAPABILITY_NAMED_IAM \
+#     --template-body file://cf_templates/eb_app.yml \
+#     --parameters ParameterKey=EC2InstanceType,ParameterValue=t2.micro \
+#     ...[all params neeeded for app]
+#
+Description: Bridge Worker Platform Application
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  AwsDefaultVpcId:
+    Description: The AWS account's default VPC id
+    Type: String
+    Default: param_place_holder
+  AwsSnsNotificationEndpoint:
+    Type: String
+    Description: Email address for AWS SNS notifications
+    Default: param_place_holder
+  AwsSolutionStackName:
+    Description: The AWS Solution Stack
+    Type: String
+    Default: param_place_holder
+  Env:
+    Type: String
+    Default: param_place_holder
+  BridgeEnv:
+    Type: String
+    Default: param_place_holder
+  BridgeUser:
+    Type: String
+    Default: param_place_holder
+  BridgeWorkerEmail:
+    Type: String
+    Default: param_place_holder
+  BridgeWorkerPassword:
+    Type: String
+    Default: param_place_holder
+    NoEcho: true
+  BridgeWorkerStudy:
+    Type: String
+    Default: param_place_holder
+  EC2InstanceType:
+    Type: String
+    Description: Instance type to use for Elastic Beanstalk Instances
+    Default: t2.micro
+    AllowedValues:
+      - t1.micro
+      - t2.nano
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - m1.small
+      - m1.medium
+      - m1.large
+      - m1.xlarge
+      - m3.medium
+      - m3.large
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m2.xlarge
+      - m2.2xlarge
+      - m2.4xlarge
+      - cr1.8xlarge
+      - r3.large
+      - r3.xlarge
+      - r3.2xlarge
+      - r3.4xlarge
+      - r3.8xlarge
+      - r4.large
+      - r4.xlarge
+      - r4.2xlarge
+      - r4.4xlarge
+      - r4.8xlarge
+      - r4.16xlarge
+      - x1.16xlarge
+      - x1.32xlarge
+      - i2.xlarge
+      - i2.2xlarge
+      - i2.4xlarge
+      - i2.8xlarge
+      - hi1.4xlarge
+      - hs1.8xlarge
+      - c1.medium
+      - c1.xlarge
+      - c3.large
+      - c3.xlarge
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.large
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - cc1.4xlarge
+      - cc2.8xlarge
+      - g2.2xlarge
+      - g2.8xlarge
+      - cg1.4xlarge
+      - p2.xlarge
+      - p2.8xlarge
+      - p2.16xlarge
+      - d2.xlarge
+      - d2.2xlarge
+      - d2.4xlarge
+      - d2.8xlarge
+      - f1.2xlarge
+      - f1.16xlarge
+  Env:
+    Type: String
+    Default: param_place_holder
+  JdbcConnectionString:
+    Type: String
+    Default: param_place_holder
+    NoEcho: true
+  SynapseApiKey:
+    Type: String
+    Default: param_place_holder
+    NoEcho: true
+  SynapseUser:
+    Type: String
+    Default: param_place_holder
+Resources:
+  AWSEBConfigurationTemplate:
+    Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
+    Properties:
+      ApplicationName: !Ref AWSEBApplication
+      SolutionStackName: !Ref AwsSolutionStackName
+      OptionSettings:
+        # EB environment options
+        - Namespace: 'aws:elasticbeanstalk:xray'
+          OptionName: XRayEnabled
+          Value: false
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: IamInstanceProfile
+          Value: !Ref AWSIAMInstanceProfile
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: InstanceType
+          Value: !Ref EC2InstanceType
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: SecurityGroups
+          Value: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - AWSEC2SecurityGroup
+        - Namespace: 'aws:elasticbeanstalk:command'
+          OptionName: DeploymentPolicy
+          Value: 'AllAtOnce'
+        - Namespace: 'aws:elasticbeanstalk:environment'
+          OptionName: EnvironmentType
+          Value: 'SingleInstance'
+        - Namespace: 'aws:elasticbeanstalk:environment'
+          OptionName: ServiceRole
+          Value: !Ref AWSIAMServiceRole
+        - Namespace: 'aws:elasticbeanstalk:cloudwatch:logs'
+          OptionName: StreamLogs
+          Value: 'true'
+        - Namespace: 'aws:elasticbeanstalk:cloudwatch:logs'
+          OptionName: DeleteOnTerminate
+          Value: 'true'
+        - Namespace: 'aws:elasticbeanstalk:cloudwatch:logs'
+          OptionName: RetentionInDays
+          Value: '90'
+        - Namespace: 'aws:elasticbeanstalk:sqsd'
+          OptionName: HttpConnections
+          Value: '10'
+        # Application environment options
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: ENV
+          Value: !Ref Env
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: JDBC_CONNECTION_STRING
+          Value: !Ref JdbcConnectionString
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: bridge.env
+          Value: !Ref BridgeEnv
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: bridge.user
+          Value: !Ref BridgeUser
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: bridge.worker.email
+          Value: !Ref BridgeWorkerEmail
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: bridge.worker.password
+          Value: !Ref BridgeWorkerPassword
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: bridge.worker.studay
+          Value: !Ref BridgeWorkerStudy
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: synapse.user
+          Value: !Ref SynapseUser
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: synapse.api.key
+          Value: !Ref SynapseApiKey
+  AWSEBApplication:
+    Type: 'AWS::ElasticBeanstalk::Application'
+    Properties:
+      ApplicationName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - application
+  AWSEBEnvironment:
+    Type: 'AWS::ElasticBeanstalk::Environment'
+    Properties:
+      ApplicationName: !Ref AWSEBApplication
+      TemplateName: !Ref AWSEBConfigurationTemplate
+      EnvironmentName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+      Tier:
+        Name: Worker
+        Type: SQS/HTTP
+  AWSS3AppDeployBucket:
+    Type: 'AWS::S3::Bucket'
+  AWSIAMServiceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - elasticbeanstalk.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                sts:ExternalId: elasticbeanstalk
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkEnhancedHealth'
+        - 'arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkService'
+  AWSIAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
+  AWSIAMInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref AWSIAMRole
+  AWSSNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      Subscription:
+        -
+          Endpoint: !Ref AwsSnsNotificationEndpoint
+          Protocol: "email"
+  # App Service User
+  AWSIAMBridgeWorkerServiceUserAccessKey:
+    Type: 'AWS::IAM::AccessKey'
+    Properties:
+      UserName: !Ref AWSIAMBridgeWorkerServiceUser
+  AWSIAMBridgeWorkerServiceUser:
+    Type: 'AWS::IAM::User'
+    Properties:
+      Groups:
+        - !Ref AWSIAMBridgeWorkerServiceUserGroup
+  AWSIAMBridgeWorkerServiceUserGroup:
+    Type: 'AWS::IAM::Group'
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+  AWSLBSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Load Balancer Security Group
+      VpcId: !Ref AwsDefaultVpcId
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: '443'
+          ToPort: '443'
+          IpProtocol: tcp
+        - CidrIp: 0.0.0.0/0
+          FromPort: '80'
+          ToPort: '80'
+          IpProtocol: tcp
+      SecurityGroupEgress:
+        - CidrIp: 0.0.0.0/0
+          FromPort: '80'
+          ToPort: '80'
+          IpProtocol: tcp
+  AWSEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    DependsOn: AWSLBSecurityGroup
+    Properties:
+      GroupName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - AWSEC2SecurityGroup
+      GroupDescription: EC2 Security Group
+      VpcId: !Ref AwsDefaultVpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          SourceSecurityGroupId: !Ref AWSLBSecurityGroup
+
+Outputs:
+  AWSS3AppDeployBucket:
+    Value: !Ref AWSS3AppDeployBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-AppDeployBucket'
