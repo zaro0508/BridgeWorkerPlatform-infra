@@ -25,7 +25,7 @@ ParameterKey=BridgeWorkerEmail,ParameterValue="$BridgeWorkerEmail" \
 ParameterKey=BridgeWorkerStudy,ParameterValue=$BridgeWorkerStudy \
 ParameterKey=BridgeWorkerPassword,ParameterValue=$BridgeWorkerPassword \
 ParameterKey=EC2InstanceType,ParameterValue=t2.micro \
-ParameterKey=Env,ParameterValue=$env \
+ParameterKey=Env,ParameterValue=$Env \
 ParameterKey=JbdcConnectionString,ParameterValue=$JbdcConnectionString \
 ParameterKey=AwsSolutionStackName,ParameterValue=$AwsSolutionStackName \
 ParameterKey=SynapseApiKey,ParameterValue=$SynapseApiKey \
