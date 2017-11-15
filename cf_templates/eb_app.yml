@@ -200,11 +200,11 @@ Resources:
           OptionName: bridge.worker.studay
           Value: !Ref BridgeWorkerStudy
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: synapse.user
-          Value: !Ref SynapseUser
-        - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.api.key
           Value: !Ref SynapseApiKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: synapse.user
+          Value: !Ref SynapseUser
   AWSEBApplication:
     Type: 'AWS::ElasticBeanstalk::Application'
     Properties:
