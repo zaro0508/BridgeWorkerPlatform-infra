@@ -7,7 +7,6 @@ eval export "BridgeWorkerEmail=\$BridgeWorkerEmail_$TRAVIS_BRANCH"
 eval export "BridgeWorkerStudy=\$BridgeWorkerStudy_$TRAVIS_BRANCH"
 eval export "BridgeWorkerPassword=\$BridgeWorkerPassword_$TRAVIS_BRANCH"
 eval export "Env=\$Env_$TRAVIS_BRANCH"
-eval export "JdbcConnectionString=\$JdbcConnectionString_$TRAVIS_BRANCH"
 eval export "SynapseApiKey=\$SynapseApiKey_$TRAVIS_BRANCH"
 eval export "SynapseUser=\$SynapseUser_$TRAVIS_BRANCH"
 
@@ -26,7 +25,6 @@ ParameterKey=BridgeWorkerStudy,ParameterValue=$BridgeWorkerStudy \
 ParameterKey=BridgeWorkerPassword,ParameterValue=$BridgeWorkerPassword \
 ParameterKey=EC2InstanceType,ParameterValue=t2.micro \
 ParameterKey=Env,ParameterValue=$Env \
-ParameterKey=JdbcConnectionString,ParameterValue=$JdbcConnectionString \
 ParameterKey=AwsSolutionStackName,ParameterValue="$AwsSolutionStackName" \
 ParameterKey=SynapseApiKey,ParameterValue=$SynapseApiKey \
 ParameterKey=SynapseUser,ParameterValue=$SynapseUser
