@@ -34,9 +34,6 @@ Parameters:
     Description: The AWS Solution Stack
     Type: String
     Default: param_place_holder
-  Env:
-    Type: String
-    Default: param_place_holder
   BridgeEnv:
     Type: String
     Default: param_place_holder
