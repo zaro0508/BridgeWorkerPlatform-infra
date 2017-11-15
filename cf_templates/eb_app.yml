@@ -322,9 +322,37 @@ Resources:
           FromPort: '80'
           ToPort: '80'
           SourceSecurityGroupId: !Ref AWSLBSecurityGroup
-
+  AWSSQSQueueDeadLetter:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      VisibilityTimeout: 30
+      DelaySeconds: 0
+      FifoQueue: false
+      MaximumMessageSize: 12024
+      MessageRetentionPeriod: 1209600
+      ReceiveMessageWaitTimeSeconds: 20
+  AWSSQSQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      VisibilityTimeout: 7200
+      DelaySeconds: 0
+      FifoQueue: false
+      MaximumMessageSize: 12024
+      MessageRetentionPeriod: 1209600
+      ReceiveMessageWaitTimeSeconds: 20
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt AWSSQSWorkerPlatformRequestDl.Arn
+        maxReceiveCount: 5
 Outputs:
   AWSS3AppDeployBucket:
     Value: !Ref AWSS3AppDeployBucket
     Export:
       Name: !Sub '${AWS::StackName}-AppDeployBucket'
+  AWSSQSQueue:
+    Value: !Ref AWSSQSQueue
+    Export:
+      Name: !Sub '${AWS::StackName}-SqsQueue'
+  AWSSQSQueueDeadLetter:
+    Value: !Ref AWSSQSQueueDeadLetter
+    Export:
+      Name: !Sub '${AWS::StackName}-SqsQueueDeadLetter'
