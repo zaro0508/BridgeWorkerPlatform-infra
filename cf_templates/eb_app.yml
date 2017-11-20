@@ -177,6 +177,9 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:cloudwatch:logs'
           OptionName: RetentionInDays
           Value: '90'
+        - Namespace: 'aws:elasticbeanstalk:hostmanager'
+          OptionName: LogPublicationControl
+          Value: true
         - Namespace: 'aws:elasticbeanstalk:sqsd'
           OptionName: HttpConnections
           Value: '10'
