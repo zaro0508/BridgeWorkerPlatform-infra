@@ -20,4 +20,6 @@ export BridgeWorkerStudy_uat=api
 export SynapseUser_develop=BridgeExporterDev
 export SynapseUser_prod=BridgeExporter
 export SynapseUser_uat=BridgeExporterStaging
-
+export UserDataBucket_develop=org-sagebridge-userdata-develop
+export UserDataBucket_prod=org-sagebridge-userdata-prod
+export UserDataBucket_uat=org-sagebridge-userdata-uat
