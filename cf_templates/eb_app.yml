@@ -136,6 +136,9 @@ Parameters:
   SynapseUser:
     Type: String
     Default: param_place_holder
+  UserDataBucket:
+    Type: String
+    Default: param_place_holder
 Resources:
   AWSEBConfigurationTemplate:
     Type: 'AWS::ElasticBeanstalk::ConfigurationTemplate'
@@ -231,6 +234,47 @@ Resources:
         Type: SQS/HTTP
   AWSS3AppDeployBucket:
     Type: 'AWS::S3::Bucket'
+  AWSIAMDynamoManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action:
+              - 'dynamodb:GetItem'
+              - 'dynamodb:Query'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-exporter-SynapseTables'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-HealthId'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-Study'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-SynapseSurveyTables'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-UploadSchema'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-UploadSchema/index/studyId-index'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-FitBitTables'
+  AWSIAMS3ManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action:
+              - 's3:PutObject'
+              - 's3:GetObject'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:s3:::${UserDataBucket}/*'
+  AWSIAMSesManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action:
+              - 'ses:SendEmail'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*'
   AWSIAMServiceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -265,6 +309,9 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
+        - !Ref AWSIAMDynamoManagedPolicy
+        - !Ref AWSIAMS3ManagedPolicy
+        - !Ref AWSIAMSesManagedPolicy
   AWSIAMInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
@@ -292,8 +339,10 @@ Resources:
     Type: 'AWS::IAM::Group'
     Properties:
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
-        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+        - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
+        - !Ref AWSIAMDynamoManagedPolicy
+        - !Ref AWSIAMS3ManagedPolicy
+        - !Ref AWSIAMSesManagedPolicy
   AWSLBSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
@@ -334,3 +383,7 @@ Outputs:
     Value: !Ref AWSS3AppDeployBucket
     Export:
       Name: !Sub '${AWS::StackName}-AppDeployBucket'
+  UserDataBucket:
+    Value: !Ref UserDataBucket
+    Export:
+      Name: !Sub '${AWS::StackName}-UserDataBucket'

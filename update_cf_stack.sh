@@ -9,6 +9,7 @@ eval export "BridgeWorkerPassword=\$BridgeWorkerPassword_$TRAVIS_BRANCH"
 eval export "Env=\$Env_$TRAVIS_BRANCH"
 eval export "SynapseApiKey=\$SynapseApiKey_$TRAVIS_BRANCH"
 eval export "SynapseUser=\$SynapseUser_$TRAVIS_BRANCH"
+eval export "UserDataBucket=\$UserDataBucket_$TRAVIS_BRANCH"
 
 # deploy with evaluated vars
 aws cloudformation update-stack \
@@ -27,4 +28,5 @@ ParameterKey=EC2InstanceType,ParameterValue=t2.micro \
 ParameterKey=Env,ParameterValue=$Env \
 ParameterKey=AwsSolutionStackName,ParameterValue="$AwsSolutionStackName" \
 ParameterKey=SynapseApiKey,ParameterValue=$SynapseApiKey \
-ParameterKey=SynapseUser,ParameterValue=$SynapseUser
+ParameterKey=SynapseUser,ParameterValue=$SynapseUser \
+ParameterKey=UserDataBucket,ParameterValue=$UserDataBucket
