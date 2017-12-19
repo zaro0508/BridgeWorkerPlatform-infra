@@ -234,7 +234,19 @@ Resources:
         Type: SQS/HTTP
   AWSS3AppDeployBucket:
     Type: 'AWS::S3::Bucket'
-  AWSIAMDynamoManagedPolicy:
+  AWSIAMFitBitDdbManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action:
+              - 'dynamodb:GetItem'
+              - 'dynamodb:PutItem'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-FitBitTables'
+  AWSIAMUddDdbManagedPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
         PolicyDocument:
@@ -251,7 +263,6 @@ Resources:
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-SynapseSurveyTables'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-UploadSchema'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-UploadSchema/index/studyId-index'
-              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-FitBitTables'
   AWSIAMS3ManagedPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -309,7 +320,8 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
-        - !Ref AWSIAMDynamoManagedPolicy
+        - !Ref AWSIAMFitBitDdbManagedPolicy
+        - !Ref AWSIAMUddDdbManagedPolicy
         - !Ref AWSIAMS3ManagedPolicy
         - !Ref AWSIAMSesManagedPolicy
   AWSIAMInstanceProfile:
@@ -340,7 +352,8 @@ Resources:
     Properties:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
-        - !Ref AWSIAMDynamoManagedPolicy
+        - !Ref AWSIAMFitBitDdbManagedPolicy
+        - !Ref AWSIAMUddDdbManagedPolicy
         - !Ref AWSIAMS3ManagedPolicy
         - !Ref AWSIAMSesManagedPolicy
   AWSLBSecurityGroup:
