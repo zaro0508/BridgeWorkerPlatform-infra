@@ -129,6 +129,13 @@ Parameters:
   Env:
     Type: String
     Default: param_place_holder
+  NewRelicAppName:
+    Type: String
+    Default: param_place_holder
+  NewRelicLicenseKey:
+    Type: String
+    Default: param_place_holder
+    NoEcho: true
   SynapseApiKey:
     Type: String
     Default: param_place_holder
@@ -168,6 +175,12 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: EnvironmentType
           Value: 'SingleInstance'
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: NEW_RELIC_APP_NAME
+          Value: !Ref NewRelicAppName
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: NEW_RELIC_LICENSE_KEY
+          Value: !Ref NewRelicLicenseKey
         - Namespace: 'aws:elasticbeanstalk:environment'
           OptionName: ServiceRole
           Value: !Ref AWSIAMServiceRole
