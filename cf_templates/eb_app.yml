@@ -422,8 +422,18 @@ Resources:
           FromPort: '80'
           ToPort: '80'
           SourceSecurityGroupId: !Ref AWSLBSecurityGroup
+  AWSLogsTomcatLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: !Join
+        - '/'
+        - - /aws/elasticbeanstalk
+          - !Ref 'AWS::StackName'
+          - var/log/tomcat8/catalina.out
+      RetentionInDays: 90
   AWSCWRequestActivityMetricFilter:
     Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSLogsTomcatLogGroup
     Properties:
       LogGroupName: !Join
         - '/'
