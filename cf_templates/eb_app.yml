@@ -299,6 +299,24 @@ Resources:
             Effect: Allow
             Resource:
               - !Sub 'arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/*'
+  # cloudwatch integration https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/AWSHowTo.cloudwatchlogs.html
+  AWSIAMCloudwatchIntegrationManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:GetLogEvents'
+              - 'logs:PutLogEvents'
+              - 'logs:DescribeLogGroups'
+              - 'logs:DescribeLogStreams'
+              - 'logs:PutRetentionPolicy'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:logs:${AWS::Region}:*:*'
   AWSIAMServiceRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -337,6 +355,7 @@ Resources:
         - !Ref AWSIAMUddDdbManagedPolicy
         - !Ref AWSIAMS3ManagedPolicy
         - !Ref AWSIAMSesManagedPolicy
+        - !Ref AWSIAMCloudwatchIntegrationManagedPolicy
   AWSIAMInstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
     Properties:
@@ -403,7 +422,40 @@ Resources:
           FromPort: '80'
           ToPort: '80'
           SourceSecurityGroupId: !Ref AWSLBSecurityGroup
-
+  AWSCWRequestActivityMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    Properties:
+      LogGroupName: !Join
+        - '/'
+        - - /aws/elasticbeanstalk
+          - !Ref 'AWS::StackName'
+          - var/log/tomcat8/catalina.out
+      FilterPattern: 'org.sagebionetworks.bridge.reporter.worker.BridgeReporterProcessor - Request took'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/RequestActivity"
+          MetricName: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - RequestActivityCount
+  AWSCWRequestActivityAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Ref AWSSNSTopic
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: 1
+      MetricName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - RequestActivityCount
+      Namespace: LogMetrics/RequestActivity
+      Period: 86400
+      Statistic: Maximum
+      Threshold: 1
+      TreatMissingData: notBreaching
 Outputs:
   AWSS3AppDeployBucket:
     Value: !Ref AWSS3AppDeployBucket
