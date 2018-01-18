@@ -466,6 +466,77 @@ Resources:
       Statistic: Maximum
       Threshold: 1
       TreatMissingData: notBreaching
+  AWSCWRequestErrorMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSLogsTomcatLogGroup
+    Properties:
+      LogGroupName: !Join
+        - '/'
+        - - /aws/elasticbeanstalk
+          - !Ref 'AWS::StackName'
+          - var/log/tomcat8/catalina.out
+      FilterPattern: 'ERROR
+                      - "HttpResponseException: Forbidden"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Errors"
+          MetricName: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - RequestErrorCount
+  AWSCWRequestErrorAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Ref AWSSNSTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - RequestErrorCount
+      Namespace: LogMetrics/Errors
+      Period: 43200
+      Statistic: Sum
+      Threshold: 10
+      TreatMissingData: notBreaching
+  AWSCWRequestWarningMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSLogsTomcatLogGroup
+    Properties:
+      LogGroupName: !Join
+        - '/'
+        - - /aws/elasticbeanstalk
+          - !Ref 'AWS::StackName'
+          - var/log/tomcat8/catalina.out
+      FilterPattern: 'WARN'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Warnings"
+          MetricName: !Join
+            - '-'
+            - - !Ref 'AWS::StackName'
+              - RequestWarningCount
+  AWSCWRequestWarningAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Ref AWSSNSTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: !Join
+        - '-'
+        - - !Ref 'AWS::StackName'
+          - RequestWarningCount
+      Namespace: LogMetrics/Warnings
+      Period: 43200
+      Statistic: Sum
+      Threshold: 100
+      TreatMissingData: notBreaching
 Outputs:
   AWSS3AppDeployBucket:
     Value: !Ref AWSS3AppDeployBucket
