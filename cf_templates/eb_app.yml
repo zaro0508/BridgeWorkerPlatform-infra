@@ -440,7 +440,7 @@ Resources:
         - - /aws/elasticbeanstalk
           - !Ref 'AWS::StackName'
           - var/log/tomcat8/catalina.out
-      FilterPattern: 'org.sagebionetworks.bridge.reporter.worker.BridgeReporterProcessor - Request took'
+      FilterPattern: '"org.sagebionetworks.bridge.reporter.worker.BridgeReporterProcessor - Request took"'
       MetricTransformations:
         -
           MetricValue: "1"
