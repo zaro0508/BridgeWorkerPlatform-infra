@@ -538,6 +538,10 @@ Resources:
       Threshold: 100
       TreatMissingData: notBreaching
 Outputs:
+  AWSSNSTopic:
+    Value: !Ref AWSSNSTopic
+    Export:
+      Name: !Sub '${AWS::StackName}-SnsTopic'
   AWSS3AppDeployBucket:
     Value: !Ref AWSS3AppDeployBucket
     Export:
