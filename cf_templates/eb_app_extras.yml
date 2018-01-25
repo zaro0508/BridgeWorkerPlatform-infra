@@ -1,0 +1,260 @@
+# This CF script is for creating resources to support EB apps that have not been automated
+# This script is not meant for CI, it should be manually execuated.
+#
+#   aws --profile aws.admin.user --region us-east-1 cloudformation \
+#     create-stack --stack-name bridgeworker-extras --capabilities CAPABILITY_NAMED_IAM \
+#     --on-failure DELETE --template-body file://cf_templates/eb_app_extras.yml \
+
+Description: Bridge Worker Platform Application Extras
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  # Setup cloudwatch metric and notifications for EB Bridge-WorkerPlatform-* Envs
+  AWSLogsBridgeWorkerPlatformDevLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-dev/var/log/tomcat8/catalina.out'
+      RetentionInDays: 90
+  AWSLogsBridgeWorkerPlatformUatLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-uat/var/log/tomcat8/catalina.out'
+      RetentionInDays: 90
+  AWSLogsBridgeWorkerPlatformProdLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-prod/var/log/tomcat8/catalina.out'
+      RetentionInDays: 90
+
+  AWSCWBridgeWorkerPlatformDevRequestActivityMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformDevLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-dev/var/log/tomcat8/catalina.out'
+      FilterPattern: '"org.sagebionetworks.bridge.reporter.worker.BridgeReporterProcessor - Request took"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/RequestActivity"
+          MetricName: 'BridgeWorkerPlatformDevRequestActivityCount'
+  AWSCWBridgeWorkerPlatformUatRequestActivityMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformUatLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-uat/var/log/tomcat8/catalina.out'
+      FilterPattern: '"org.sagebionetworks.bridge.reporter.worker.BridgeReporterProcessor - Request took"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/RequestActivity"
+          MetricName: 'BridgeWorkerPlatformUatRequestActivityCount'
+  AWSCWBridgeWorkerPlatformProdRequestActivityMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformProdLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-prod/var/log/tomcat8/catalina.out'
+      FilterPattern: '"org.sagebionetworks.bridge.reporter.worker.BridgeReporterProcessor - Request took"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/RequestActivity"
+          MetricName: 'BridgeWorkerPlatformProdRequestActivityCount'
+
+  AWSCWBridgeWorkerPlatformDevRequestActivityAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-develop-SnsTopic
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformDevRequestActivityCount'
+      Namespace: LogMetrics/RequestActivity
+      Period: 86400
+      Statistic: Maximum
+      Threshold: 1
+      TreatMissingData: notBreaching
+  AWSCWBridgeWorkerPlatformUatRequestActivityAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-uat-SnsTopic
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformUatRequestActivityCount'
+      Namespace: LogMetrics/RequestActivity
+      Period: 86400
+      Statistic: Maximum
+      Threshold: 1
+      TreatMissingData: notBreaching
+  AWSCWBridgeWorkerPlatformProdRequestActivityAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-prod-SnsTopic
+      ComparisonOperator: LessThanThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformProdRequestActivityCount'
+      Namespace: LogMetrics/RequestActivity
+      Period: 86400
+      Statistic: Maximum
+      Threshold: 1
+      TreatMissingData: notBreaching
+
+  AWSCWBridgeWorkerPlatformDevRequestErrorMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformDevLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-dev/var/log/tomcat8/catalina.out'
+      FilterPattern: 'ERROR
+                      - "HttpResponseException: Forbidden"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Errors"
+          MetricName: 'BridgeWorkerPlatformDevRequestErrorCount'
+  AWSCWBridgeWorkerPlatformUatRequestErrorMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformUatLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-uat/var/log/tomcat8/catalina.out'
+      FilterPattern: 'ERROR
+                      - "HttpResponseException: Forbidden"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Errors"
+          MetricName: 'BridgeWorkerPlatformUatRequestErrorCount'
+  AWSCWBridgeWorkerPlatformProdRequestErrorMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformProdLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-prod/var/log/tomcat8/catalina.out'
+      FilterPattern: 'ERROR
+                      - "HttpResponseException: Forbidden"'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Errors"
+          MetricName: 'BridgeWorkerPlatformProdRequestErrorCount'
+
+  AWSCWBridgeWorkerPlatformDevRequestErrorAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-develop-SnsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformDevRequestErrorCount'
+      Namespace: LogMetrics/Errors
+      Period: 3600
+      Statistic: Sum
+      Threshold: 10
+      TreatMissingData: notBreaching
+  AWSCWBridgeWorkerPlatformUatRequestErrorAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-uat-SnsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformUatRequestErrorCount'
+      Namespace: LogMetrics/Errors
+      Period: 3600
+      Statistic: Sum
+      Threshold: 10
+      TreatMissingData: notBreaching
+  AWSCWBridgeWorkerPlatformProdRequestErrorAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-prod-SnsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformProdRequestErrorCount'
+      Namespace: LogMetrics/Errors
+      Period: 3600
+      Statistic: Sum
+      Threshold: 10
+      TreatMissingData: notBreaching
+
+  AWSCWBridgeWorkerPlatformDevRequestWarningMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformDevLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-dev/var/log/tomcat8/catalina.out'
+      FilterPattern: 'WARN'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Warnings"
+          MetricName: 'BridgeWorkerPlatformDevRequestWarningCount'
+  AWSCWBridgeWorkerPlatformUatRequestWarningMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformUatLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-uat/var/log/tomcat8/catalina.out'
+      FilterPattern: 'WARN'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Warnings"
+          MetricName: 'BridgeWorkerPlatformUatRequestWarningCount'
+  AWSCWBridgeWorkerPlatformProdRequestWarningMetricFilter:
+    Type: "AWS::Logs::MetricFilter"
+    DependsOn: AWSBridgeWorkerPlatformProdLogGroup
+    Properties:
+      LogGroupName: '/aws/elasticbeanstalk/Bridge-WorkerPlatform-prod/var/log/tomcat8/catalina.out'
+      FilterPattern: 'WARN'
+      MetricTransformations:
+        -
+          MetricValue: "1"
+          MetricNamespace: "LogMetrics/Warnings"
+          MetricName: 'BridgeWorkerPlatformProdRequestWarningCount'
+
+  AWSCWBridgeWorkerPlatformDevRequestWarningAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-develop-SnsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformDevRequestWarningCount'
+      Namespace: LogMetrics/Warnings
+      Period: 3600
+      Statistic: Sum
+      Threshold: 100
+      TreatMissingData: notBreaching
+  AWSCWBridgeWorkerPlatformUatRequestWarningAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-uat-SnsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformUatRequestWarningCount'
+      Namespace: LogMetrics/Warnings
+      Period: 3600
+      Statistic: Sum
+      Threshold: 100
+      TreatMissingData: notBreaching
+  AWSCWBridgeWorkerPlatformProdRequestWarningAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !ImportValue bridgeworker-prod-SnsTopic
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      EvaluationPeriods: 1
+      MetricName: 'BridgeWorkerPlatformProdRequestWarningCount'
+      Namespace: LogMetrics/Warnings
+      Period: 3600
+      Statistic: Sum
+      Threshold: 100
+      TreatMissingData: notBreaching
