@@ -1,5 +1,4 @@
 # environment variables for Sage-Bionetworks/BridgeWorkerPlatform-infra
-export AwsDefaultVpcId=vpc-9c70bbf9
 export AwsSnsNotificationEndpoint_develop=bridgeworker-develop@sagebase.org
 export AwsSnsNotificationEndpoint_prod=bridgeworker-prod@sagebase.org
 export AwsSnsNotificationEndpoint_uat=bridgeworker-uat@sagebase.org

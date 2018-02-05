@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # double interpolate vars from travis
+eval export "AwsDefaultVpcId=\$AwsDefaultVpcId_$TRAVIS_BRANCH"
 eval export "AwsSnsNotificationEndpoint=\$AwsSnsNotificationEndpoint_$TRAVIS_BRANCH"
 eval export "BridgeEnv=\$BridgeEnv_$TRAVIS_BRANCH"
 eval export "BridgeWorkerEmail=\$BridgeWorkerEmail_$TRAVIS_BRANCH"
@@ -18,8 +19,8 @@ aws cloudformation update-stack \
 --capabilities CAPABILITY_NAMED_IAM \
 --template-body file://cf_templates/eb_app.yml \
 --parameters \
-ParameterKey=AwsSnsNotificationEndpoint,ParameterValue=$AwsSnsNotificationEndpoint \
 ParameterKey=AwsDefaultVpcId,ParameterValue=$AwsDefaultVpcId \
+ParameterKey=AwsSnsNotificationEndpoint,ParameterValue=$AwsSnsNotificationEndpoint \
 ParameterKey=BridgeEnv,ParameterValue=$BridgeEnv \
 ParameterKey=BridgeUser,ParameterValue=$BridgeUser \
 ParameterKey=BridgeWorkerEmail,ParameterValue=$BridgeWorkerEmail \
