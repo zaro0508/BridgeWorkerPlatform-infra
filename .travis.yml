@@ -10,13 +10,13 @@ branches:
 env:
   global:
     - STACK_NAME=bridgeworker-$TRAVIS_BRANCH
-
 install:
 - ./setup_git_crypt.sh
 - openssl aes-256-cbc -K $encrypted_d252773f4439_key -iv $encrypted_d252773f4439_iv -in git-crypt.key.enc -out git-crypt.key -d
 - /tmp/git-crypt-master/git-crypt unlock ./git-crypt.key
 - rm -rf git-crypt.key
 - source env_vars && source env_vars.secret
+- source ./normalize_vars.sh
 - /tmp/git-crypt-master/git-crypt lock
 - ./setup_aws_cli.sh
 script:
