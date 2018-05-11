@@ -140,6 +140,10 @@ Parameters:
     Type: String
     Default: param_place_holder
     NoEcho: true
+  SynapsePrincipalId:
+    Type: Number
+    Default: param_place_holder
+    NoEcho: true
   SynapseUser:
     Type: String
     Default: param_place_holder
@@ -219,11 +223,14 @@ Resources:
           OptionName: bridge.worker.password
           Value: !Ref BridgeWorkerPassword
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: bridge.worker.studay
+          OptionName: bridge.worker.study
           Value: !Ref BridgeWorkerStudy
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.api.key
           Value: !Ref SynapseApiKey
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: synapse.principal.id
+          Value: !Ref SynapsePrincipalId
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.user
           Value: !Ref SynapseUser
