@@ -141,9 +141,8 @@ Parameters:
     Default: param_place_holder
     NoEcho: true
   SynapsePrincipalId:
-    Type: Number
+    Type: String
     Default: param_place_holder
-    NoEcho: true
   SynapseUser:
     Type: String
     Default: param_place_holder
