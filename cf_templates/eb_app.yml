@@ -265,6 +265,21 @@ Resources:
             Effect: Allow
             Resource:
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-FitBitTables'
+  AWSIAMNotificationsWorkerDdbManagedPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Action:
+              - 'dynamodb:GetItem'
+              - 'dynamodb:PutItem'
+              - 'dynamodb:Query'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-NotificationConfig'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-NotificationLog'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-WorkerLog'
   AWSIAMUddDdbManagedPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -358,6 +373,7 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
         - !Ref AWSIAMFitBitDdbManagedPolicy
+        - !Ref AWSIAMNotificationsWorkerDdbManagedPolicy
         - !Ref AWSIAMUddDdbManagedPolicy
         - !Ref AWSIAMS3ManagedPolicy
         - !Ref AWSIAMSesManagedPolicy
@@ -391,6 +407,7 @@ Resources:
       ManagedPolicyArns:
         - 'arn:aws:iam::aws:policy/AWSElasticBeanstalkWorkerTier'
         - !Ref AWSIAMFitBitDdbManagedPolicy
+        - !Ref AWSIAMNotificationsWorkerDdbManagedPolicy
         - !Ref AWSIAMUddDdbManagedPolicy
         - !Ref AWSIAMS3ManagedPolicy
         - !Ref AWSIAMSesManagedPolicy
