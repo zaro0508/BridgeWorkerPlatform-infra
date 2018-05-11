@@ -19,5 +19,6 @@ ParameterKey=AwsSolutionStackName,ParameterValue="$AwsSolutionStackName" \
 ParameterKey=NewRelicAppName,ParameterValue="$STACK_NAME" \
 ParameterKey=NewRelicLicenseKey,ParameterValue="$NewRelicLicenseKey" \
 ParameterKey=SynapseApiKey,ParameterValue="$SynapseApiKey" \
+ParameterKey=SynapsePrincipalId,ParameterValue="$SynapsePrincipalId" \
 ParameterKey=SynapseUser,ParameterValue="$SynapseUser" \
 ParameterKey=UserDataBucket,ParameterValue="$UserDataBucket"
