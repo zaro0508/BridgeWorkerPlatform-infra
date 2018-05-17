@@ -1,0 +1,19 @@
+template_path: templates/bridgeworker.yaml
+stack_name: bridgeworker-{{ environment_variable.TRAVIS_BRANCH }}
+parameters:
+  AwsDefaultVpcId: {{ environment_variable.AwsDefaultVpcId_uat }}
+  AwsSnsNotificationEndpoint: {{ environment_variable.AwsSnsNotificationEndpoint_uat }}
+  BridgeEnv: {{ environment_variable.BridgeEnv_uat }}
+  BridgeUser: {{ environment_variable.BridgeUser }}
+  BridgeWorkerEmail: {{ environment_variable.BridgeWorkerEmail_uat }}
+  BridgeWorkerStudy: {{ environment_variable.BridgeWorkerStudy_uat }}
+  BridgeWorkerPassword: {{ environment_variable.BridgeWorkerPassword_uat }}
+  EC2InstanceType: t2.micro
+  Env: {{ environment_variable.Env_uat }}
+  AwsSolutionStackName: {{ environment_variable.AwsSolutionStackName }}
+  NewRelicAppName: bridgeworker-{{ environment_variable.TRAVIS_BRANCH }}
+  NewRelicLicenseKey: {{ environment_variable.NewRelicLicenseKey }}
+  SynapseApiKey: {{ environment_variable.SynapseApiKey_uat }}
+  SynapsePrincipalId: "{{ environment_variable.SynapsePrincipalId_uat }}"
+  SynapseUser: {{ environment_variable.SynapseUser_uat }}
+  UserDataBucket: {{ environment_variable.UserDataBucket_uat }}
