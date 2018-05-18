@@ -479,7 +479,7 @@ Resources:
       AlarmActions:
         - !Ref AWSSNSTopic
       ComparisonOperator: LessThanThreshold
-      EvaluationPeriods: 1
+      EvaluationPeriods: 2
       MetricName: !Join
         - '-'
         - - !Ref 'AWS::StackName'
