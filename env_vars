@@ -1,4 +1,8 @@
 # environment variables for Sage-Bionetworks/BridgeWorkerPlatform-infra
+export BridgeInfraCfBucket_develop=bridge-cloudformation-artifacts-649232250620
+export BridgeInfraCfBucket_uat=bridge-cloudformation-artifacts-649232250620
+export BridgeInfraCfBucket_prod=bridge-cloudformation-artifacts-649232250620
+
 export AwsSnsNotificationEndpoint_develop=bridgeworker-develop@sagebase.org
 export AwsSnsNotificationEndpoint_prod=bridgeworker-prod@sagebase.org
 export AwsSnsNotificationEndpoint_uat=bridgeworker-uat@sagebase.org
