@@ -472,23 +472,6 @@ Resources:
             - '-'
             - - !Ref 'AWS::StackName'
               - RequestActivityCount
-  AWSCWRequestActivityAlarm:
-    Type: "AWS::CloudWatch::Alarm"
-    Properties:
-      ActionsEnabled: true
-      AlarmActions:
-        - !Ref AWSSNSTopic
-      ComparisonOperator: LessThanThreshold
-      EvaluationPeriods: 2
-      MetricName: !Join
-        - '-'
-        - - !Ref 'AWS::StackName'
-          - RequestActivityCount
-      Namespace: LogMetrics/RequestActivity
-      Period: 86400
-      Statistic: Maximum
-      Threshold: 1
-      TreatMissingData: notBreaching
   AWSCWRequestErrorMetricFilter:
     Type: "AWS::Logs::MetricFilter"
     DependsOn: AWSLogsTomcatLogGroup
