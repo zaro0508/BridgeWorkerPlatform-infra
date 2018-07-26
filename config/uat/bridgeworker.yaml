@@ -1,19 +1,19 @@
 template_path: templates/bridgeworker.yaml
-stack_name: bridgeworker-{{ environment_variable.TRAVIS_BRANCH }}
+stack_name: bridgeworker-uat
 parameters:
-  AwsDefaultVpcId: {{ environment_variable.AwsDefaultVpcId_uat }}
-  AwsSnsNotificationEndpoint: {{ environment_variable.AwsSnsNotificationEndpoint_uat }}
-  BridgeEnv: {{ environment_variable.BridgeEnv_uat }}
-  BridgeUser: {{ environment_variable.BridgeUser }}
-  BridgeWorkerEmail: {{ environment_variable.BridgeWorkerEmail_uat }}
-  BridgeWorkerStudy: {{ environment_variable.BridgeWorkerStudy_uat }}
-  BridgeWorkerPassword: {{ environment_variable.BridgeWorkerPassword_uat }}
+  AwsDefaultVpcId: vpc-9c70bbf9
+  AwsSnsNotificationEndpoint: bridgeworker-uat@sagebase.org
+  BridgeEnv: uat
+  BridgeUser: heroku
+  BridgeWorkerEmail: bridgeit+worker@sagebase.org
+  BridgeWorkerStudy: api
+  BridgeWorkerPassword: !ssm /bridgeworker-uat/BridgeWorkerPassword
   EC2InstanceType: t2.micro
-  Env: {{ environment_variable.Env_uat }}
-  AwsSolutionStackName: {{ environment_variable.AwsSolutionStackName }}
-  NewRelicAppName: bridgeworker-{{ environment_variable.TRAVIS_BRANCH }}
-  NewRelicLicenseKey: {{ environment_variable.NewRelicLicenseKey }}
-  SynapseApiKey: {{ environment_variable.SynapseApiKey_uat }}
-  SynapsePrincipalId: "{{ environment_variable.SynapsePrincipalId_uat }}"
-  SynapseUser: {{ environment_variable.SynapseUser_uat }}
-  UserDataBucket: {{ environment_variable.UserDataBucket_uat }}
+  Env: staging
+  AwsSolutionStackName: '64bit Amazon Linux 2017.09 v2.7.5 running Tomcat 8 Java 8'
+  NewRelicAppName: bridgeworker-uat
+  NewRelicLicenseKey: !ssm /infra/NewRelicLicenseKey
+  SynapseApiKey:  !ssm /bridgeworker-uat/SynapseApiKey
+  SynapsePrincipalId: '3327942'
+  SynapseUser: BridgeExporterStaging
+  UserDataBucket: org-sagebridge-userdata-uat
