@@ -3,6 +3,7 @@ stack_name: bridgeworker-develop
 parameters:
   AwsDefaultVpcId: vpc-9c70bbf9
   AwsSnsNotificationEndpoint: bridgeworker-develop@sagebase.org
+  BackfillBucket: org-sagebridge-backfill-develop
   BridgeEnv: dev
   BridgeUser: heroku
   BridgeWorkerEmail: bridgeit+worker@sagebase.org

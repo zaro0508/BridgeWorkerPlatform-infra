@@ -3,6 +3,7 @@ stack_name: bridgeworker-uat
 parameters:
   AwsDefaultVpcId: vpc-9c70bbf9
   AwsSnsNotificationEndpoint: bridgeworker-uat@sagebase.org
+  BackfillBucket: org-sagebridge-backfill-uat
   BridgeEnv: uat
   BridgeUser: heroku
   BridgeWorkerEmail: bridgeit+worker@sagebase.org

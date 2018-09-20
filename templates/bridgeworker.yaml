@@ -31,6 +31,8 @@ Parameters:
   AwsSolutionStackName:
     Description: The AWS Solution Stack
     Type: String
+  BackfillBucket:
+    Type: String
   BridgeEnv:
     Type: String
     Default: dev
@@ -298,6 +300,7 @@ Resources:
               - 's3:GetObject'
             Effect: Allow
             Resource:
+              - !Sub 'arn:aws:s3:::${BackfillBucket}/*'
               - !Sub 'arn:aws:s3:::${UserDataBucket}/*'
   AWSIAMSesManagedPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
