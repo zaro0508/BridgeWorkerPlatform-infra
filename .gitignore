@@ -109,7 +109,7 @@ git-crypt.key
 !.elasticbeanstalk/*.global.yml
 
 # sceptre artifacts
-remote-templates
+templates/remote/
 
 # lambda artifacts
 lambdas/*.zip
