@@ -1,4 +1,4 @@
-template_path: templates/bridgeworker.yaml
+template_path: bridgeworker.yaml
 stack_name: bridgeworker-prod
 parameters:
   AwsDefaultVpcId: vpc-9c70bbf9
