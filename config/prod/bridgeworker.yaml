@@ -11,7 +11,6 @@ parameters:
   BridgeWorkerPassword: !ssm /bridgeworker-prod/BridgeWorkerPassword
   EC2InstanceType: t2.micro
   Env: production
-  AwsSolutionStackName: '64bit Amazon Linux 2018.03 v3.0.1 running Tomcat 8 Java 8'
   NewRelicAppName: bridgeworker-prod
   NewRelicLicenseKey: !ssm /infra/NewRelicLicenseKey
   SynapseApiKey:  !ssm /bridgeworker-prod/SynapseApiKey
