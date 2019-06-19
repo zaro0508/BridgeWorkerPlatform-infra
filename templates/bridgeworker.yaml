@@ -269,6 +269,7 @@ Resources:
             Effect: Allow
             Resource:
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-exporter-SynapseTables'
+              - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-exporter-SynapseMetaTables'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-HealthId'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-Study'
               - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${BridgeEnv}-${BridgeUser}-SynapseSurveyTables'
