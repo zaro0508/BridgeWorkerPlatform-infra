@@ -536,7 +536,7 @@ Resources:
         - - /aws/elasticbeanstalk
           - !Ref 'AWS::StackName'
           - var/log/tomcat8/catalina.out
-      FilterPattern: 'WARN'
+      FilterPattern: 'WARN - WarningHeaderInterceptor'
       MetricTransformations:
         -
           MetricValue: "1"
