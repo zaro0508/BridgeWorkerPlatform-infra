@@ -193,6 +193,9 @@ Resources:
           OptionName: bridge.worker.study
           Value: !Ref BridgeWorkerStudy
         - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: bridge.worker.appId
+          Value: !Ref BridgeWorkerStudy
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: synapse.api.key
           Value: !Ref SynapseApiKey
         - Namespace: 'aws:elasticbeanstalk:application:environment'
